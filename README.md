@@ -84,7 +84,7 @@ Note the API Endpoint URL from the Outputs:
 $ cd ..
 $ cd anti-corruption-layer-impl && dotnet build
 $ cd ../..
-$ curl -X POST https://<update-this>.execute-api.<update-this-region>.amazonaws.com/dev/user -H "Content-Type: application/json" -d '{"UserId": 12345, "Address": "475 Sansome St,10th floor","City": "San Francisco","State": "California","ZipCode": 94111,"Country": "United States"}'
+$ curl -X POST https://xscm5a4z1j.execute-api.localhost.localstack.cloud:4566/prod/user -H "Content-Type: application/json" -d '{"UserId": 12345, "Address": "475 Sansome St,10th floor","City": "San Francisco","State": "California","ZipCode": 94111,"Country": "United States"}'
 ```
 
 You will get the following output if the call succeeds:
