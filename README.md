@@ -21,7 +21,7 @@ Users can deploy this application on LocalStack and AWS with no changes using Cl
 
 The following diagram shows the architecture that this sample application builds and deploys:
 
-![]()
+![anti-corruption-layer-pattern](anti-corruption-layer-pattern.png)
 
 We are using the following AWS services and their features to build our infrastructure:
 
