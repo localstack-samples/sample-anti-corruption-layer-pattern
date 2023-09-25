@@ -1,101 +1,114 @@
-# Implementing the Anti-Corruption Layer pattern
+# Anti-Corruption Layer pattern with .NET, API Gateway, Lambda, and DynamoDB
 
-## Intent
+| Key          | Value                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------- |
+| Environment  | <img src="https://img.shields.io/badge/LocalStack-deploys-4D29B4.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAKgAAACoABZrFArwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAALbSURBVHic7ZpNaxNRFIafczNTGIq0G2M7pXWRlRv3Lusf8AMFEQT3guDWhX9BcC/uFAr1B4igLgSF4EYDtsuQ3M5GYrTaj3Tmui2SpMnM3PlK3m1uzjnPw8xw50MoaNrttl+r1e4CNRv1jTG/+v3+c8dG8TSilHoAPLZVX0RYWlraUbYaJI2IuLZ7KKUWCisgq8wF5D1A3rF+EQyCYPHo6Ghh3BrP8wb1en3f9izDYlVAp9O5EkXRB8dxxl7QBoNBpLW+7fv+a5vzDIvVU0BELhpjJrmaK2NMw+YsIxunUaTZbLrdbveZ1vpmGvWyTOJToNlsuqurq1vAdWPMeSDzwzhJEh0Bp+FTmifzxBZQBXiIKaAq8BBDQJXgYUoBVYOHKQRUER4mFFBVeJhAQJXh4QwBVYeHMQJmAR5GCJgVeBgiYJbg4T8BswYPp+4GW63WwvLy8hZwLcd5TudvBj3+OFBIeA4PD596nvc1iiIrD21qtdr+ysrKR8cY42itCwUP0Gg0+sC27T5qb2/vMunB/0ipTmZxfN//orW+BCwmrGV6vd63BP9P2j9WxGbxbrd7B3g14fLfwFsROUlzBmNM33XdR6Meuxfp5eg54IYxJvXCx8fHL4F3w36blTdDI4/0WREwMnMBeQ+Qd+YC8h4g78wF5D1A3rEqwBiT6q4ubpRSI+ewuhP0PO/NwcHBExHJZZ8PICI/e73ep7z6zzNPwWP1djhuOp3OfRG5kLROFEXv19fXP49bU6TbYQDa7XZDRF6kUUtEtoFb49YUbh/gOM7YbwqnyG4URQ/PWlQ4ASllNwzDzY2NDX3WwioKmBgeqidgKnioloCp4aE6AmLBQzUExIaH8gtIBA/lFrCTFB7KK2AnDMOrSeGhnAJSg4fyCUgVHsolIHV4KI8AK/BQDgHW4KH4AqzCQwEfiIRheKKUAvjuuu7m2tpakPdMmcYYI1rre0EQ1LPo9w82qyNziMdZ3AAAAABJRU5ErkJggg=="> <img src="https://img.shields.io/badge/AWS-deploys-F29100.svg?logo=amazon">                                                                     |
+| Services     | API Gateway, DynamoDB, Lambda                                 |
+| Integrations | CDK                                                                            |
+| Categories   | Serverless; Microservices; Software Architecture                                                   |
+| Level        | Intermediate                                                                            |
+| GitHub       | [Repository link](https://github.com/localstack-samples/sample-anti-corruption-layer-pattern)   |
 
-The Anti-Corruption Layer (ACL) pattern acts as a mediation layer that translates the domain model semantics from one system to another system. It translates the upstream bounded context’s (monolith) model into one that suits the downstream bounded context (microservice) before consuming the communication contract established by the upstream team. This may be applicable when the downstream bounded context contains a core subdomain or the upstream model is an unmodifiable legacy systems. It also reduces transformation risk and business disruption by preventing changes to the callers when the redirection needs to be done transparently. 
+## Introduction
 
-## Motivation
+The sample application implements an Anti-Corruption Layer (ACL) pattern to act as a mediation layer that translates the domain model semantics from one system to another system. It translates the upstream bounded context’s (monolith) model into one that suits the downstream bounded context (microservice) before consuming the communication contract established by the upstream team. 
 
-During the migration process, when a monolithic application is migrated into microservices, they may be changes in domain model semantics of the newly migrated service. When the features within the monolith require to call these microservices, the calls should be routed to the migrated service without requiring any changes to the calling services. Anti-corruption layer allows the monolith to call the microservices transparently by acting as a adapter or a facade layer that translates the calls into the newer semantics. 
+In this sample application, a user  microservice has been strangled out of the ASP.NET monolith application. The user microservice has been deployed as a Lambda function on AWS and calls to the Lambda function are routed through an API Gateway. An anti-corruption layer has been deployed in the monolith that translates the call to adapt to the semantics of the user microservice.
 
-## Architecture
+Users can deploy this application on LocalStack and AWS with no changes using Cloud Development Kit (CDK). To test this application sample, we will demonstrate how you use LocalStack to deploy the infrastructure on your developer machine and your CI environment.
 
-![4_AWS](4_AWS.png)
+## Architecture diagram
 
-In the architecture above, the User microservice has been strangled out of the ASP.NET monolith application. The microservice that has been deployed as a Lambda function on AWS and calls to the Lambda function are routed through Amazon API Gateway. An anti-corruption layer has been deployed in the monolith that translates the call to adapt to the semantics of the User microservice. 
+The following diagram shows the architecture that this sample application builds and deploys:
 
-When **Program.cs** calls the User service (**UserInMonolith.cs**) inside the monolith, call is routed to the Anti-corruption layer (**UserServiceACL.cs**) that translates the call to the new semantics and interface, and calls the microservice by calling the API Gateway endpoint. The caller, _Program.cs_ is not aware of the translation and routing that takes place in the User service and Anti-corruption layer. Caller is not aware of the code changes leading to lesser business disruption and reduced risk of transformation. 
+![]()
 
-### Prerequisites:
+We are using the following AWS services and their features to build our infrastructure:
 
-- An [AWS](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fportal.aws.amazon.com%2Fbilling%2Fsignup%2Fresume&client_id=signup) account
-- An AWS user with AdministratorAccess (see the [instructions](https://console.aws.amazon.com/iam/home#/roles%24new?step=review&commonUseCase=EC2%2BEC2&selectedUseCase=EC2&policies=arn:aws:iam::aws:policy%2FAdministratorAccess) on the [AWS Identity and Access Management](http://aws.amazon.com/iam) (IAM) console)
-- [Node.js](https://nodejs.org/en/download) `18.0.0` or later installed 
-- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed
-- [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed 
-- Access to the following AWS services: [Amazon API Gateway](https://aws.amazon.com/api-gateway/), [AWS Lambda](https://aws.amazon.com/lambda/), and [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
-- [.NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) SDK installed and [.NET Core Global Tools for AWS](https://aws.amazon.com/blogs/developer/net-core-global-tools-for-aws/)
-- A zip archiver tool
-- [JetBrains Rider](https://www.jetbrains.com/rider/) or [Microsoft Visual Studio](https://visualstudio.microsoft.com/) 2017 or later (or [Visual Studio Code](https://code.visualstudio.com/))
+- [DynamoDB](https://docs.localstack.cloud/user-guide/aws/dynamodb/) to store the user data for the user microservice implementation.
+- [API Gateway](https://docs.localstack.cloud/user-guide/aws/apigateway/) to expose the user microservice implementation as a REST API.
+- [Lambda](https://docs.localstack.cloud/user-guide/aws/lambda/) to host the user microservice implementation, exposed via API Gateway.
 
-## Implementation
+## Prerequisites
 
-There are three repos in this example. 
+- LocalStack Pro with the [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
+- [Cloud Development Kit](https://docs.localstack.cloud/user-guide/integrations/aws-cdk/) with the [`cdklocal`](https://www.npmjs.com/package/aws-cdk-local) installed.
+- [.NET Core 7.0](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) or later and [.NET Core Global Tools for AWS](https://aws.amazon.com/blogs/developer/net-core-global-tools-for-aws/)
 
-- [ ] anti-corruption-layer-impl - Contains the source code for the .NET 6.0 monolithic application and this contains the implementation of the Anti-corruption layer.
-- [ ] cdk-user-microservice - CDK implementation for the AWS services
-- [ ] user-microservice-lambda - Source code for Lambda function
+Start the LocalStack Pro container via the following command:
 
-### Step 1: Download the application
-
-```sh
-git clone https://github.com/aws-samples/anti-corruption-layer-pattern.git
+```shell
+export LOCALSTACK_API_KEY=<YOUR_API_KEY>
+DEBUG=1 localstack start
 ```
 
-### Step 2: Create packages for the Lambda function
+We specified DEBUG=1 to get the printed LocalStack logs directly in the terminal to help us visualize the background tasks in action. If you prefer running LocalStack in detached mode, you can add the `-d` flag to the `localstack start` command, and use Docker Desktop to view the logs.
 
-The Lambda functions in the user-microservice-lambda directory must be packaged and copied to the cdk-user-microservice\lambdas directory before deployment. Run these commands to process the UserMicroserviceLambda function:
+## Instructions
 
-```sh
-$ cd anti-corruption-layer
-$ cd user-microservice-lambda/src/UserMicroserviceLambda
-$ dotnet tool install --global Amazon.Lambda.Tools
-$ dotnet lambda package
-$ mkdir -p ../../../cdk-user-microservice/lambdas # create lambdas folder if there is no lambdas folder
-$ cp bin/Release/net6.0/UserMicroserviceLambda.zip ../../../cdk-user-microservice/lambdas
-$ cd ../../..
+### Creating packages for the Lambda function
+
+The Lambda functions in the `user-microservice-lambda` directory should be packaged and copied to the `cdk-user-microservice/lambdas` directory before deploying them using CDK. You can run these commands to process the `UserMicroserviceLambda` function:
+
+```shell
+cd user-microservice-lambda/src/UserMicroserviceLambda
+dotnet lambda package
+mkdir -p ../../../cdk-user-microservice/lambdas
+cp bin/Release/net6.0/UserMicroserviceLambda.zip ../../../cdk-user-microservice/lambdas
+cd ../../..
 ```
 
-### Step 3: Deploy the CDK code
+### Deploying the CDK code
 
-The cdk.json file tells the CDK Toolkit how to execute your app. It uses the [.NET Core CLI](https://docs.microsoft.com/dotnet/articles/core/) to compile and execute your project. Build and deploy the CDK code using the commands below. 
+To create the AWS infrastructure locally, you can use CDK and `cdklocal` wrapper. To deploy the infrastructure, you can run the following commands:
 
-```sh
-$ npm install -g aws-cdk
-$ cd cdk-user-microservice/src/CdkUserMicroservice && dotnet build
-$ cd ../..
-$ cdk bootstrap
-$ cdk synth
-$ cdk deploy
+```bash
+cd cdk-user-microservice/src/CdkUserMicroservice && dotnet build
+cd ../..
+cdklocal bootstrap
+cdklocal deploy
 ```
 
-Note the API Endpoint URL from the Outputs:
+This will deploy the `CdkUserMicroserviceStack` stack on LocalStack. You will see the following output:
 
-![api_endpoint_output](api_endpoint_output.png)
+```bash
+ ✅  CdkUserMicroserviceStack
 
+✨  Deployment time: 15.55s
 
-> **Note:** 
-> If you are using a profile other than the default profile, append the cdk bootstrap and cdk deploy commands with the profile name. e.g. <code>cdk deploy --profile _profile name_</code>
+Outputs:
+CdkUserMicroserviceStack.MicroserviceAPIEndpointE7B12008 = https://bn2bzt4beb.execute-api.localhost.localstack.cloud:4566/prod/
+Stack ARN:
+arn:aws:cloudformation:us-east-1:000000000000:stack/CdkUserMicroserviceStack/7a2ad8e4
 
-
-### Step 4: Test the deployment
-
-```sh
-$ cd ..
-$ cd anti-corruption-layer-impl && dotnet build
-$ cd ../..
-$ curl -X POST https://xscm5a4z1j.execute-api.localhost.localstack.cloud:4566/prod/user -H "Content-Type: application/json" -d '{"UserId": 12345, "Address": "475 Sansome St,10th floor","City": "San Francisco","State": "California","ZipCode": 94111,"Country": "United States"}'
+✨  Total time: 22.43s
 ```
 
-You will get the following output if the call succeeds:
+The output will show the API Gateway URL endpoint to be used for testing. You will see a different URL endpoint in your output, and you can save it for later use.
 
+### Testing the application
+
+You can use the following command to send a test event to the API Gateway:
+
+```bash
+cd ..
+cd anti-corruption-layer-impl && dotnet build
+cd ../..
+curl -X POST https://bn2bzt4beb.execute-api.localhost.localstack.cloud:4566/prod/user -H "Content-Type: application/json" -d '{"UserId": 12345, "Address": "475 Sansome St,10th floor","City": "San Francisco","State": "California","ZipCode": 94111,"Country": "United States"}'
 ```
-{"statusCode":200,"headers":{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"},"body":"Processed","isBase64Encoded":false}%    
+
+Change the URL endpoint with the one you received in the CDK output. You will see the following response:
+
+```bash
+{"statusCode":200,"headers":{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"},"body":"Processed","isBase64Encoded":false}                            
 ```
-## Security
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+## GitHub Action
 
-## License
+This application sample hosts an example GitHub Action workflow that starts up LocalStack, builds the Lambda functions, and deploys the infrastructure on the runner. You can find the workflow in the `.github/workflows/main.yml` file. To run the workflow, you can fork this repository and push a commit to the `main` branch.
 
-This library is licensed under the MIT-0 License. See the LICENSE file.
+Users can adapt this example workflow to run in their own CI environment. LocalStack supports various CI environments, including GitHub Actions, CircleCI, Jenkins, Travis CI, and more. You can find more information about the CI integration in the [LocalStack documentation](https://docs.localstack.cloud/user-guide/ci/).
+
+## Contributing
+
+We appreciate your interest in contributing to our project and are always looking for new ways to improve the developer experience. We welcome feedback, bug reports, and even feature ideas from the community. Refer to the [contributing guide](CONTRIBUTING.md) for more details on how to get started.
