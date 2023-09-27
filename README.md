@@ -93,8 +93,8 @@ You can use the following command to send a test event to the API Gateway:
 ```bash
 cd ..
 cd anti-corruption-layer-impl && dotnet build
-cd ../..
-curl -X POST https://bn2bzt4beb.execute-api.localhost.localstack.cloud:4566/prod/user -H "Content-Type: application/json" -d '{"UserId": 12345, "Address": "475 Sansome St,10th floor","City": "San Francisco","State": "California","ZipCode": 94111,"Country": "United States"}'
+API_ENDPOINT=<your-api-endpoint-returned-by-cdk-output>
+curl -X POST $API_ENDPOINT/user -H "Content-Type: application/json" -d '{"UserId": 12345, "Address": "475 Sansome St,10th floor","City": "San Francisco","State": "California","ZipCode": 94111,"Country": "United States"}'
 ```
 
 Change the URL endpoint with the one you received in the CDK output. You will see the following response:
