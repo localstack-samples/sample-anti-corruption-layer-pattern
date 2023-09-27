@@ -13,7 +13,7 @@
 
 The sample application implements an Anti-Corruption Layer (ACL) pattern to act as a mediation layer that translates the domain model semantics from one system to another system. It translates the upstream bounded context’s (monolith) model into one that suits the downstream bounded context (microservice) before consuming the communication contract established by the upstream team. 
 
-In this sample application, a user  microservice has been strangled out of the ASP.NET monolith application. The user microservice has been deployed as a Lambda function on AWS and calls to the Lambda function are routed through an API Gateway. An anti-corruption layer has been deployed in the monolith that translates the call to adapt to the semantics of the user microservice.
+In this sample application, a user microservice has been strangled out of the ASP.NET monolith application. The user microservice has been deployed as a Lambda function on AWS and calls to the Lambda function are routed through an API Gateway. An anti-corruption layer has been deployed in the monolith that translates the call to adapt to the semantics of the user microservice.
 
 Users can deploy this application on LocalStack and AWS with no changes using Cloud Development Kit (CDK). To test this application sample, we will demonstrate how you use LocalStack to deploy the infrastructure on your developer machine and your CI environment.
 
