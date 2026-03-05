@@ -31,15 +31,19 @@ We are using the following AWS services and their features to build our infrastr
 
 ## Prerequisites
 
-- LocalStack Pro with the [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
 - [Cloud Development Kit](https://docs.localstack.cloud/user-guide/integrations/aws-cdk/) with the [`cdklocal`](https://www.npmjs.com/package/aws-cdk-local) installed.
 - [.NET Core 7.0](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) or later and [.NET Core Global Tools for AWS](https://aws.amazon.com/blogs/developer/net-core-global-tools-for-aws/)
 
-Start the LocalStack Pro container via the following command:
+## Start LocalStack
+
+Start LocalStack with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 
 ```shell
-export LOCALSTACK_AUTH_TOKEN=<YOUR_AUTH_TOKEN>
-DEBUG=1 localstack start
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+make start
+make ready
 ```
 
 We specified DEBUG=1 to get the printed LocalStack logs directly in the terminal to help us visualize the background tasks in action. If you prefer running LocalStack in detached mode, you can add the `-d` flag to the `localstack start` command, and use Docker Desktop to view the logs.

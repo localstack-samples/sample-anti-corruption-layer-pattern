@@ -23,12 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: gautamkrishnar/keepalive-workflow@v1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -54,6 +54,7 @@ jobs:
 
       - name: Start LocalStack
         env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
           DNS_ADDRESS: 0
         run: |
           pip install localstack awscli-local[ver1]
@@ -97,7 +98,7 @@ jobs:
       
       - name: Upload the Diagnostic Report
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: diagnose.json.gz
           path: ./diagnose.json.gz
