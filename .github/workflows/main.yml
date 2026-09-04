@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   cdk:
@@ -57,7 +58,6 @@ jobs:
         run: |
           docker pull localstack/localstack:latest
           LOCALSTACK_LS_LOG=trace lstk start --non-interactive
-          echo "Startup complete"
 
       - name: Deploy infrastructure using CDK
         env:
@@ -95,3 +95,10 @@ jobs:
         with:
           name: diagnose.json.gz
           path: ./diagnose.json.gz
+
+      # Re-enabling the workflow resets GitHub's 60-day scheduled-workflow inactivity timer
+      - name: Keep the scheduled workflow enabled
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT repos/${{ github.repository }}/actions/workflows/main.yml/enable
