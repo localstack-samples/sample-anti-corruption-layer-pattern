@@ -57,7 +57,7 @@ jobs:
           LOCALSTACK_DNS_ADDRESS: 0
         run: |
           docker pull localstack/localstack:latest
-          LOCALSTACK_LS_LOG=trace lstk start --non-interactive
+          LOCALSTACK_LS_LOG=trace lstk start
 
       - name: Deploy infrastructure using CDK
         env:
