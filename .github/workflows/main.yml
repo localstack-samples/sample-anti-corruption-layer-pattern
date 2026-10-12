@@ -34,6 +34,7 @@ jobs:
         run: |
           npm install -g @localstack/lstk aws-cdk
           cdk --version
+          lstk setup aws --force --non-interactive
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
@@ -69,6 +70,9 @@ jobs:
           cd ../..
           lstk cdk bootstrap
           lstk cdk deploy --require-approval never
+
+      - name: Run tests
+        run: make test
 
       - name: Send a Slack notification
         if: failure() || github.event_name != 'pull_request'

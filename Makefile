@@ -23,4 +23,7 @@ deploy:		## Deploy infrastructure using CDK
 	cd cdk-user-microservice/src/CdkUserMicroservice && dotnet build
 	cd cdk-user-microservice && lstk cdk bootstrap && lstk cdk deploy --require-approval never
 
-.PHONY: usage install start stop logs deploy
+test:		## Send a request through API Gateway and check the response and logs
+	./test.sh
+
+.PHONY: usage install start stop logs deploy test
